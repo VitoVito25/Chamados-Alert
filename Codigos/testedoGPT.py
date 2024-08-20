@@ -5,7 +5,7 @@ from selenium.webdriver.support.ui import Select
 
 #Passando credenciais
 login = "victor.renaud"
-senha = "Senador214"
+senha = ""
 
 #Iniciando o Chrome
 servico = Service(ChromeDriverManager().install())

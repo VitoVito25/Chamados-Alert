@@ -5,7 +5,7 @@ from selenium.webdriver.support.ui import Select
 
 #Passando credenciais
 login = "victor.renaud"
-senha = "Senador214"
+senha = ""
 
 #Iniciando o Chrome
 servico = Service(ChromeDriverManager().install())
@@ -26,8 +26,6 @@ termos_para_busca = ["TRAMITE 5.0", "ALMOX 5.0", "SCF 5.0", "SPT 5.0", "SRH 5.0"
 
 # Lista para armazenar os conteúdos de td[2]
 conteudos_encontrados = []
-
-print(navegador.find_element('xpath', f'//*[@id="tableMeusChamados"]/tbody/tr[{i}]/td[3]').text)
 
 #Deixando o navegador aberto até "Enter"
 input("Pressione Enter para fechar o navegador...")
