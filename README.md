@@ -6,5 +6,5 @@
 # Eu apresento o Chamados-Alert!
 # Um pequeno sistema que vai te informar quando existirem chamados do seu sistema no Backlog do Suporte
 
-# Para iniciar execute o arquivo "APP" ou o "main" dentro da pasta códigos
+# Para iniciar execute o arquivo "main"
 # Para rodar este programa você deve ter o compilador Python instalado em sua maquina.
