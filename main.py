@@ -16,7 +16,7 @@ def main():
     
     clear_console()
     print_art()
-    systems_to_search = ["TRAMITE 5.00", "ALMOX 5.00", "SCF 5.00", "SCP 5.00", "SCP 5.00"]
+    systems_to_search = ["TRAMITE 5.00", "ALMOX 5.00", "SCF 5.00", "STP 5.00", "BI 5.00"]
     print("Buscando pelos sistemas: ", ' - '.join(systems_to_search))
 
     try:

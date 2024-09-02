@@ -4,6 +4,9 @@ from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.support.ui import Select
 from selenium.common.exceptions import WebDriverException
 from selenium.common.exceptions import NoSuchElementException
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.common.by import By
 from plyer import notification
 import getpass
 import subprocess
@@ -120,26 +123,36 @@ def get_search_interval():
 
 def search_tickets(browser, systems_to_search):
     print("Realizando busca...")
-    
-    # Filtrando chamados do Suporte
-    Select(browser.find_element('xpath', '//*[@id="page-wrapper"]/div[2]/div[1]/form/div/div[2]/div[2]/select')).select_by_value('3053')
-    browser.find_element('xpath', '//*[@id="page-wrapper"]/div[2]/div[1]/form/div/div[1]/button').click()
 
-    # Iniciando lista para valores encontrados
-    found_contents = []
+    try:
+        # Filtrando chamados do Suporte
+        Select(browser.find_element('xpath', '//*[@id="page-wrapper"]/div[2]/div[1]/form/div/div[2]/div[2]/select')).select_by_value('3053')
+        browser.find_element('xpath', '//*[@id="page-wrapper"]/div[2]/div[1]/form/div/div[1]/button').click()
 
-    # Contabilizando número de linhas na tabela
-    rows = browser.find_elements('xpath', '//*[@id="tableMeusChamados"]/tbody/tr')
+        # Aguardando a tabela carregar após o clique (espera explícita)
+        WebDriverWait(browser, 10).until(EC.presence_of_element_located((By.XPATH, '//*[@id="tableMeusChamados"]/tbody/tr')))
 
-    for row in rows:
-        td_text = row.find_element('xpath', './td[3]').text
-        
-        for system in systems_to_search:
-            if system in td_text:
-                ticket_number = row.find_element('xpath', './td[2]/a').text
-                found_contents.append((ticket_number, system))
+        # Iniciando lista para valores encontrados
+        found_contents = []
 
-    return found_contents
+        # Contabilizando número de linhas na tabela
+        rows = browser.find_elements('xpath', '//*[@id="tableMeusChamados"]/tbody/tr')
+
+        for row in rows:
+            try:
+                td_text = row.find_element('xpath', './td[3]').text
+                for system in systems_to_search:
+                    if system in td_text:
+                        ticket_number = row.find_element('xpath', './td[2]/a').text
+                        found_contents.append((ticket_number, system))
+            except Exception as e:
+                print(f"Erro ao processar linha: {e}")
+
+        return found_contents
+
+    except Exception as e:
+        print(f"Erro durante a busca: {e}")
+        return []
 
 def display_results(found_contents):
     if found_contents:
