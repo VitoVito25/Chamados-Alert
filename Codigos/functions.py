@@ -3,7 +3,31 @@ from selenium import webdriver
 from webdriver_manager.chrome import ChromeDriverManager 
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.support.ui import Select
+from selenium.common.exceptions import WebDriverException
 from plyer import notification
+
+# Variável global para armazenar a instância do navegador
+browser = None
+
+def start_browser():
+    global browser  # Utiliza a variável global 'browser'
+    
+    if browser is None:
+        print("O navegador não estava aberto. Iniciando uma nova instância.")
+        service = Service(ChromeDriverManager().install())
+        browser = webdriver.Chrome(service=service)
+    else:
+        try:
+            # Tenta acessar a URL atual para verificar se o navegador está ativo
+            browser.current_url  
+            print("O navegador já está aberto e será utilizado.")
+        except WebDriverException:
+            # Se o navegador foi fechado ou não está mais ativo, cria uma nova instância
+            print("O navegador não está mais aberto. Iniciando uma nova instância.")
+            service = Service(ChromeDriverManager().install())
+            browser = webdriver.Chrome(service=service)
+    
+    return browser
 
 def get_credentials():
     print("Sistema de alerta de chamados novos!")
@@ -12,23 +36,6 @@ def get_credentials():
     username = input("Login: ")
     password = input("Senha: ")
     return username, password
-
-def start_browser():
-    try:
-        # Tenta acessar a URL atual para verificar se o navegador controlado pelo Selenium já está aberto
-        browser.current_url  
-        print("O navegador já está aberto e será utilizado.")
-    except NameError:
-        # Se o navegador ainda não foi inicializado, o objeto 'browser' não existirá (NameError)
-        print("O navegador não estava aberto. Iniciando uma nova instância.")
-        service = Service(ChromeDriverManager().install())
-        browser = webdriver.Chrome(service=service)
-    except:
-        # Se o navegador foi fechado ou ocorreu outro erro, uma nova instância será iniciada
-        print("O navegador não está mais ativo. Iniciando uma nova instância.")
-        service = Service(ChromeDriverManager().install())
-        browser = webdriver.Chrome(service=service)
-    return browser
 
 def access_colaborador(browser, username, password):
     try:
@@ -83,29 +90,3 @@ def display_results(found_contents):
         )
     else:
         print("Nenhum chamado encontrado no momento.")
-
-def main():
-    username, password = get_credentials()
-    systems_to_search = ["TRAMITE 5.00", "ALMOX 5.00", "SCF 5.00", "STP 5.00", "SRH 5.00"]
-    
-    print("Buscando pelos sistemas: ", ' - '.join(systems_to_search))
-
-    browser = start_browser()
-    access_colaborador(browser, username, password)
-
-    search_interval_min = 5
-    search_interval_sec = 10 #search_interval_min * 60
-
-    try:
-        while True:
-            found_contents = search_tickets(browser, systems_to_search)
-            display_results(found_contents)
-            print(f"Aguardando {search_interval_min} minutos para a próxima busca...")
-            print(f"Pressione 'Ctrl + C' para finalizar o programa ")
-            time.sleep(search_interval_sec)
-    except KeyboardInterrupt:
-        print("Parando o programa.")
-    finally:
-        browser.quit()
-
-main()
