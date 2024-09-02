@@ -5,9 +5,22 @@ from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.support.ui import Select
 from selenium.common.exceptions import WebDriverException
 from plyer import notification
+import getpass
+from utils import clear_console
 
 # Variável global para armazenar a instância do navegador
 browser = None
+
+def print_art():
+       print("""
+       _                               _                    _           _     _ 
+      | |                             | |                  | |         | |   | |
+   ___| |__   __ _ _ __ ___   __ _  __| | ___  ___     __ _| | ___ _ __| |_  | |
+  / __| '_ \ / _` | '_ ` _ \ / _` |/ _` |/ _ \/ __|   / _` | |/ _ \ '__| __| | |
+ | (__| | | | (_| | | | | | | (_| | (_| | (_) \__ \  | (_| | |  __/ |  | |_  |_|
+  \___|_| |_|\__,_|_| |_| |_|\__,_|\__,_|\___/|___/   \__,_|_|\___|_|   \__| (_)
+                                                                                                                                                                                                                                        
+    """)
 
 def start_browser():
     global browser  # Utiliza a variável global 'browser'
@@ -30,12 +43,33 @@ def start_browser():
     return browser
 
 def get_credentials():
-    print("Sistema de alerta de chamados novos!")
     print("Insira os dados de acesso ao Colaborador")
 
     username = input("Login: ")
-    password = input("Senha: ")
+    password = getpass.getpass("Senha (Nao será mostrada no terminal): ")
     return username, password
+
+def get_search_interval():
+    while True:
+        user_input = input("Informe (em minutos) o intervalo entre buscas ou ENTER para padrão (5 minutos): ")
+        
+        if user_input == "":
+            # Se o usuário pressionar ENTER, use o valor padrão
+            search_interval_min = 5
+            break
+        
+        try:
+            # Tenta converter a entrada para um inteiro
+            search_interval_min = int(user_input)
+            if search_interval_min <= 0:
+                print("Por favor, insira um número inteiro positivo.")
+            else:
+                break
+        except ValueError:
+            print("Entrada inválida. Por favor, insira um número inteiro.")
+
+    search_interval_sec = search_interval_min * 60
+    return search_interval_min, search_interval_sec
 
 def access_colaborador(browser, username, password):
     try:
@@ -86,7 +120,7 @@ def display_results(found_contents):
             title="Novos Chamados Encontrados!",
             message=notification_message.strip(),
             app_name="Sistema de Alerta de Chamados",
-            timeout=10
+            timeout=30
         )
     else:
         print("Nenhum chamado encontrado no momento.")
