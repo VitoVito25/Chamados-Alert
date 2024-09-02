@@ -5,6 +5,37 @@ from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.support.ui import Select
 from plyer import notification
 
+def iniciando_chrome():
+    try:
+        # Tenta acessar a URL atual para verificar se o navegador controlado pelo Selenium já está aberto
+        navegador.current_url  
+        print("O navegador já está aberto e será utilizado.")
+    except NameError:
+        # Se o navegador ainda não foi inicializado, o objeto 'navegador' não existirá (NameError)
+        print("O navegador não estava aberto. Iniciando uma nova instância.")
+        servico = Service(ChromeDriverManager().install())
+        navegador = webdriver.Chrome(service=servico)
+    except:
+        # Se o navegador foi fechado ou ocorreu outro erro, uma nova instância será iniciada
+        print("O navegador não está mais ativo. Iniciando uma nova instância.")
+        servico = Service(ChromeDriverManager().install())
+        navegador = webdriver.Chrome(service=servico)
+
+    return navegador
+
+def try_login(navegador, login, senha):
+    try: # Caso ja esteja logado
+        # Tenta encontrar um elemento que só aparece após o login
+        navegador.get("https://central.equiplano.com.br/colaborador/buscarChamado")
+        navegador.find_element('xpath', '//*[@id="tableMeusChamados_wrapper"]') #Id que aparece apenas quando ja estamos logados
+    except: # Realiza o login
+        navegador.get("https://central.equiplano.com.br/colaborador/buscarChamado")
+        navegador.find_element('xpath','//*[@id="login"]').send_keys(login)
+        navegador.find_element('xpath','//*[@id="senha"]').send_keys(senha)
+        navegador.find_element('xpath','/html/body/div/div/div/form/div/div[2]/div[3]/button') #Id que aparece apenas quando esta na tela de login
+
+
+## MAIN ## 
 print("Sistema de alerta de chamados novos!")
 print("Insira os dados de acesso ao Colaborador")
 
@@ -28,18 +59,17 @@ for sistema in sistema_para_busca:
 
 print("")
 
-# Iniciando o Chrome
-servico = Service(ChromeDriverManager().install())
-navegador = webdriver.Chrome(service=servico)
 
-def buscar_chamados():
+
+def buscar_chamados(navegador):
 
     print("Realizando busca...")
-    # Acessando url e logando
+
     navegador.get("https://central.equiplano.com.br/colaborador/buscarChamado")
     navegador.find_element('xpath','//*[@id="login"]').send_keys(login)
     navegador.find_element('xpath','//*[@id="senha"]').send_keys(senha)
-    navegador.find_element('xpath','/html/body/div/div/div/form/div/div[2]/div[3]/button').click()
+    navegador.find_element('xpath','/html/body/div/div/div/form/div/div[2]/div[3]/button')
+    
 
     # Filtrando chamados do Suporte
     Select(navegador.find_element('xpath','//*[@id="page-wrapper"]/div[2]/div[1]/form/div/div[2]/div[2]/select')).select_by_value('3053')
@@ -81,10 +111,14 @@ def buscar_chamados():
     else:
         print("Nenhum chamado encontrado no momento.")
 
+
+
 # Loop de atualização - erro
 try:
     while True:
-        buscar_chamados()
+        navegador = iniciando_chrome()
+        try_login(navegador, login, senha)
+        buscar_chamados(navegador)
         print(f"Aguardando {intervalo_busca_min} minutos para a próxima busca...")
         time.sleep(intervalo_busca_sec)  # Intervalo de atualização
 except KeyboardInterrupt:
