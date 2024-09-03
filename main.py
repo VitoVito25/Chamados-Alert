@@ -31,7 +31,7 @@ def main():
             # Obter a hora atual
             hora_atual = datetime.now().strftime("%H:%M:%S")
             print(f"[{hora_atual}] Aguardando {search_interval_min} minutos para a próxima busca...")
-            time.sleep(10)
+            time.sleep(search_interval_sec)
 
             # Limpa o vetor para sempre aparecer os mesmos dados
             found_contents.clear()
