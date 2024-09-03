@@ -8,6 +8,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
 from plyer import notification
+from datetime import datetime
 import getpass
 import subprocess
 import sys
@@ -155,8 +156,9 @@ def search_tickets(browser, systems_to_search):
         return []
 
 def display_results(found_contents):
-    if found_contents:
-        print("Novos chamados encontrados: ")
+    hora_atual = datetime.now().strftime("%H:%M:%S")
+    if found_contents:       
+        print(f"[{hora_atual}] Novos chamados encontrados: ")
         notification_message = ""
         for number, system in found_contents:
             print(f"Número do chamado: {number} - Sistema: {system}")
@@ -169,4 +171,4 @@ def display_results(found_contents):
             timeout=30
         )
     else:
-        print("Nenhum chamado encontrado no momento.")
+        print(f"[{hora_atual}] Nenhum chamado encontrado no momento.")
