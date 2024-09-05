@@ -19,7 +19,7 @@ browser = None
 
 def check_and_install_packages():
     # Packages que necessitam ser instalados para execução do programa
-    packages = ["selenium", "webdriver_manager", "plyer", "getpass"]
+    packages = ["selenium", "webdriver_manager", "plyer"]
 
     for package in packages:
         try:
