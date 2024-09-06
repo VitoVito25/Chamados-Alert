@@ -1,13 +1,10 @@
-from functions import get_credentials, start_browser, access_colaborador, search_tickets, display_results, get_search_interval, check_and_install_packages, print_art
-from utils import clear_console
+from utils import clear_console, print_art
+from functions import get_credentials, start_browser, access_colaborador, search_tickets, display_results, get_search_interval
 from datetime import datetime
-import time
+import time 
+
 
 def main():
-
-    clear_console()
-    print_art()
-    check_and_install_packages()
 
     clear_console()
     print_art()

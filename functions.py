@@ -10,36 +10,9 @@ from selenium.webdriver.common.by import By
 from plyer import notification
 from datetime import datetime
 import getpass
-import subprocess
-import sys
-from utils import clear_console
 
 # Variável global para armazenar a instância do navegador
 browser = None
-
-def check_and_install_packages():
-    # Packages que necessitam ser instalados para execução do programa
-    packages = ["selenium", "webdriver_manager", "plyer"]
-
-    for package in packages:
-        try:
-            __import__(package)
-            print(f"{package} já está instalado.")
-        except ImportError:
-            print(f"{package} não está instalado. Instalando...")
-            subprocess.check_call([sys.executable, "-m", "pip", "install", package])
-    input("\nPacotes necessarios instalados! \nPressione ENTER para continuar...")
-
-def print_art():
-       print("""
-       _                               _                    _           _     _ 
-      | |                             | |                  | |         | |   | |
-   ___| |__   __ _ _ __ ___   __ _  __| | ___  ___     __ _| | ___ _ __| |_  | |
-  / __| '_ \ / _` | '_ ` _ \ / _` |/ _` |/ _ \/ __|   / _` | |/ _ \ '__| __| | |
- | (__| | | | (_| | | | | | | (_| | (_| | (_) \__ \  | (_| | |  __/ |  | |_  |_|
-  \___|_| |_|\__,_|_| |_| |_|\__,_|\__,_|\___/|___/   \__,_|_|\___|_|   \__| (_)
-                                                                                                                                                                                                                                        
-    """)
 
 def start_browser():
     global browser  # Utiliza a variável global 'browser'
