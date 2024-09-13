@@ -1,3 +1,4 @@
+from utils import clear_console, print_art
 from selenium import webdriver
 from webdriver_manager.chrome import ChromeDriverManager 
 from selenium.webdriver.chrome.service import Service
@@ -11,7 +12,106 @@ from selenium.webdriver.common.by import By
 from plyer import notification
 from datetime import datetime
 import getpass
+import json
+import os
 
+def add_systems_to_search_and_save():
+    systems_list = []
+
+    print("Digite o nome dos sistemas (aperte ENTER sem digitar nada para finalizar):")
+    
+    while True:
+        system_name = input("Informe o nome do sistema: ").strip()
+        
+        if system_name == "":
+            # Se o usuário não digitar nada, definir sistemas padrão e sair do loop
+            if not systems_list:
+                systems_list = ["TRAMITE 5.00", "ALMOX 5.00", "SCF 5.00", "STP 5.00", "BI 5.00"]
+                print("Nenhum sistema informado. Usando a configuração padrão.")
+                input("Pressione ENTER para continuar...")
+            break
+
+        # Formatar o nome do sistema (maiúsculo + " 5.00")
+        formatted_system = system_name.upper() + " 5.00"
+        systems_list.append(formatted_system)
+
+    # Chamar a função para salvar os sistemas no arquivo JSON
+    save_systems_to_search(systems_list)
+    return systems_list
+
+def save_systems_to_search(systems_list):
+
+    filename="arquivos/systems_to_search.json"
+
+    try:
+        # Garantir que a pasta 'arquivos' exista
+        os.makedirs(os.path.dirname(filename), exist_ok=True)
+        
+        # Tentativa de salvar o arquivo JSON
+        with open(filename, 'w') as file:
+            json.dump(systems_list, file, indent=4)
+        print(f"Sistemas salvos em {filename}")
+
+    except FileNotFoundError:
+        print(f"Erro: O caminho '{filename}' não foi encontrado.")
+        input("Pressione ENTER para continuar...")
+    
+    except Exception as e:
+        # Captura qualquer outro erro inesperado
+        print(f"Ocorreu um erro ao tentar salvar os sistemas: {e}")
+        input("Pressione ENTER para continuar...")
+
+def load_systems_to_search():
+
+    filename="arquivos/systems_to_search.json"
+    try:
+        with open(filename, 'r') as file:
+            systems_list = json.load(file)
+        print(f"Sistemas carregados de {filename}")
+        return systems_list
+    except FileNotFoundError:
+        print(f"Arquivo {filename} não encontrado. Usando lista padrão.")
+        input("Pressione ENTER para continuar...")
+        return ["TRAMITE 5.00", "ALMOX 5.00", "SCF 5.00", "STP 5.00", "BI 5.00"]
+    
+def config_menu():
+    """
+        Função para acessar menu de configurações
+
+        :return search_interval_min:
+        :return search_interval_sec:
+        :return systems_to_search:
+    """
+
+    while True:
+        try:
+            # Menu de escolha do usuário
+            choice = input("Digite 1 para entrar nas configurações ou pressione ENTER para continuar com config padrão: ")
+
+            # Se o usuário pressionar ENTER, valores padrão serão usados
+            if choice == '':
+                #Padrão de intervalo entre buscas 5 minutos
+                search_interval_min = 5
+                search_interval_sec = 300
+                # Lista de sistemas carregada de um arquivo JSON
+                systems_to_search = load_systems_to_search()
+                break  # Sai do loop se a configuração padrão for escolhida
+
+            # Caso contrário, validamos se o valor digitado é '1'
+            elif choice == '1':
+                clear_console()
+                print_art()
+                search_interval_min, search_interval_sec = get_search_interval()
+                systems_to_search = add_systems_to_search_and_save()
+                break  # Sai do loop após configurar
+            else:
+                print("Entrada inválida. Digite '1' para entrar nas configurações ou pressione ENTER para configuração padrão.")
+        
+        except ValueError:
+            print("Erro: Valor inválido, por favor tente novamente.")
+
+    return search_interval_min, search_interval_sec, systems_to_search
+ 
 # Variável global para armazenar a instância do navegador
 browser = None    
 

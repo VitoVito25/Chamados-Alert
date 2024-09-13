@@ -1,5 +1,5 @@
 from utils import clear_console, print_art
-from functions import get_credentials, start_browser, access_colaborador, search_tickets, display_results, get_search_interval
+from functions import get_credentials, start_browser, access_colaborador, search_tickets, display_results, config_menu
 from datetime import datetime
 import time 
 
@@ -9,12 +9,11 @@ def main():
     clear_console()
     print_art()
     username, password = get_credentials()
-    
-    search_interval_min, search_interval_sec = get_search_interval()
+
+    search_interval_min, search_interval_sec, systems_to_search = config_menu()
     
     clear_console()
     print_art()
-    systems_to_search = ["TRAMITE 5.00", "ALMOX 5.00", "SCF 5.00", "STP 5.00", "BI 5.00"]
     print("Buscando pelos sistemas: ", ' - '.join(systems_to_search))
     print(f"Pressione 'Ctrl + C' para finalizar o programa a qualquer momento")
 
