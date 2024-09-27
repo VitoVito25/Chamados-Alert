@@ -91,6 +91,7 @@ def show_log_option():
             print("Opção invalida, por favor insira 1 ou apenas Clique Enter")
     
     return print_log
+
 def print_log_message(print_log, message):
 
     if(print_log == True):
