@@ -83,14 +83,18 @@ def show_log_option():
             # Se o usuário pressionar ENTER, nao vai printar os logs do Sistema
             print_log = False
             break
-        elif user_input == 1:
+        elif user_input == "1":
             # Se o usuário pressionar ENTER, vai printar os logs do Sistema
             print_log = True
             break
         else:
             print("Opção invalida, por favor insira 1 ou apenas Clique Enter")
     
-    return user_input
+    return print_log
+def print_log_message(print_log, message):
+
+    if(print_log == True):
+        print(message)
 
 def config_menu():
     """
@@ -113,6 +117,8 @@ def config_menu():
                 search_interval_sec = 300
                 # Lista de sistemas carregada de um arquivo JSON
                 systems_to_search = load_systems_to_search()
+                # Configuração para nao mostrar o LOG
+                print_log = False
                 break  # Sai do loop se a configuração padrão for escolhida
 
             # Caso contrário, validamos se o valor digitado é '1'
@@ -129,26 +135,34 @@ def config_menu():
         except ValueError:
             print("Erro: Valor inválido, por favor tente novamente.")
 
-    return search_interval_min, search_interval_sec, systems_to_search
+    return search_interval_min, search_interval_sec, systems_to_search, print_log
  
 # Variável global para armazenar a instância do navegador
 browser = None    
 
-def start_browser():
+def start_browser(print_log):
+    """"
+        Função para abrir o navegador ou utilizar o ja existente
+
+        :param: Passar configuração do print_log
+        :return: Retorna o browser
+
+    """
     global browser  # Utiliza a variável global 'browser'
     
     if browser is None:
-        print("O navegador não estava aberto. Iniciando uma nova instância.")
+
+        print_log_message(print_log, "[LOG] O navegador não estava aberto. Iniciando uma nova instância.")
+        
         service = Service(ChromeDriverManager().install())
         browser = webdriver.Chrome(service=service)
     else:
         try:
             # Tenta acessar a URL atual para verificar se o navegador está ativo
             browser.current_url  
-            print("O navegador já está aberto e será utilizado.")
+            print_log_message(print_log, "[LOG] O navegador já está aberto e será utilizado.")
         except WebDriverException:
-            # Se o navegador foi fechado ou não está mais ativo, cria uma nova instância
-            print("O navegador não está mais aberto. Iniciando uma nova instância.")
+            print_log_message(print_log, "[LOG] O navegador não está mais aberto. Iniciando uma nova instância.")
             service = Service(ChromeDriverManager().install())
             browser = webdriver.Chrome(service=service)
     
@@ -161,17 +175,17 @@ def get_credentials():
     password = getpass.getpass("Senha (Nao será mostrada no terminal): ")
     return username, password
 
-def access_colaborador(browser, username, password):
+def access_colaborador(browser, username, password, print_log):
     while True:
         try:
             # Verifica se já estamos logados tentando acessar um elemento que só existe após o login
             browser.get("https://central.equiplano.com.br/colaborador/buscarChamado")
             browser.find_element('xpath', '//*[@id="tableMeusChamados_wrapper"]')
-            print("Já estamos logados no sistema.")
+            print_log_message(print_log, "[LOG] Já estamos logados no sistema.")
             break
         except:
-            # Se o elemento não for encontrado, realiza o login
-            print("Não está logado, realizando o login...")
+            print_log_message(print_log, "[LOG] Não está logado, realizando o login...")
+
             browser.get("https://central.equiplano.com.br/colaborador/buscarChamado")
             browser.find_element('xpath','//*[@id="login"]').send_keys(username)
             browser.find_element('xpath','//*[@id="senha"]').send_keys(password)
@@ -180,7 +194,7 @@ def access_colaborador(browser, username, password):
             try:
                 # Verifica se o elemento da página de chamados está presente
                 browser.find_element('xpath', '//*[@id="tableMeusChamados_wrapper"]')
-                print("Login realizado com sucesso!")
+                print_log_message(print_log, "[LOG] Login realizado com sucesso!")
                 break
             except NoSuchElementException:
                 try:
@@ -215,8 +229,9 @@ def get_search_interval():
     search_interval_sec = search_interval_min * 60
     return search_interval_min, search_interval_sec
 
-def search_tickets(browser, systems_to_search):
-    print("Realizando busca...")
+def search_tickets(browser, systems_to_search, print_log):
+    
+    print_log_message(print_log, "[LOG] Realizando busca...")
 
     try:
         # Filtrando chamados do Suporte

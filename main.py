@@ -1,5 +1,5 @@
 from utils import clear_console, print_art
-from functions import get_credentials, start_browser, access_colaborador, search_tickets, display_results, config_menu
+from functions import get_credentials, start_browser, access_colaborador, search_tickets, display_results, config_menu, print_log_message
 from datetime import datetime
 import time 
 
@@ -10,7 +10,7 @@ def main():
     print_art()
     username, password = get_credentials()
 
-    search_interval_min, search_interval_sec, systems_to_search = config_menu()
+    search_interval_min, search_interval_sec, systems_to_search, print_log = config_menu()
     
     clear_console()
     print_art()
@@ -19,14 +19,13 @@ def main():
 
     try:
         while True:
-            browser = start_browser()
-            access_colaborador(browser, username, password)
-            found_contents = search_tickets(browser, systems_to_search)
+            browser = start_browser(print_log)
+            access_colaborador(browser, username, password, print_log)
+            found_contents = search_tickets(browser, systems_to_search, print_log)
             display_results(found_contents)
-
-            # Obter a hora atual
-            hora_atual = datetime.now().strftime("%H:%M:%S")
-            print(f"[{hora_atual}] Aguardando {search_interval_min} minutos para a próxima busca...")
+            
+            message_next_search = f"[LOG] Aguardando {search_interval_min} minutos para a próxima busca..."
+            print_log_message(print_log, message_next_search)
             time.sleep(search_interval_sec)
 
             # Limpa o vetor para sempre aparecer os mesmos dados
