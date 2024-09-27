@@ -74,6 +74,24 @@ def load_systems_to_search():
         input("Pressione ENTER para continuar...")
         return ["TRAMITE 5.00", "ALMOX 5.00", "SCF 5.00", "STP 5.00", "BI 5.00"]
     
+def show_log_option():
+
+    while True:
+        user_input = input("Digite 1 para ver todo o log do sistema ou ENTER para nao visualizar.")
+        
+        if user_input == "":
+            # Se o usuário pressionar ENTER, nao vai printar os logs do Sistema
+            print_log = False
+            break
+        elif user_input == 1:
+            # Se o usuário pressionar ENTER, vai printar os logs do Sistema
+            print_log = True
+            break
+        else:
+            print("Opção invalida, por favor insira 1 ou apenas Clique Enter")
+    
+    return user_input
+
 def config_menu():
     """
         Função para acessar menu de configurações
@@ -103,6 +121,7 @@ def config_menu():
                 print_art()
                 search_interval_min, search_interval_sec = get_search_interval()
                 systems_to_search = add_systems_to_search_and_save()
+                print_log = show_log_option()
                 break  # Sai do loop após configurar
             else:
                 print("Entrada inválida. Digite '1' para entrar nas configurações ou pressione ENTER para configuração padrão.")
