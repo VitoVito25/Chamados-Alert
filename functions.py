@@ -26,7 +26,7 @@ def add_systems_to_search_and_save():
         if system_name == "":
             # Se o usuário não digitar nada, definir sistemas padrão e sair do loop
             if not systems_list:
-                systems_list = ["TRAMITE 5.00", "ALMOX 5.00", "SCF 5.00", "STP 5.00", "BI 5.00"]
+                systems_list = ["TRAMITE 5.00", "ALMOX 5.00", "SCF 5.00", "STP 5.00", "SBI 5.00"]
                 print("Nenhum sistema informado. Usando a configuração padrão.")
                 input("Pressione ENTER para continuar...")
             break
@@ -72,7 +72,7 @@ def load_systems_to_search():
     except FileNotFoundError:
         print(f"Arquivo {filename} não encontrado. Usando lista padrão.")
         input("Pressione ENTER para continuar...")
-        return ["TRAMITE 5.00", "ALMOX 5.00", "SCF 5.00", "STP 5.00", "BI 5.00"]
+        return ["TRAMITE 5.00", "ALMOX 5.00", "SCF 5.00", "STP 5.00", "SBI 5.00"]
     
 def show_log_option():
 
