@@ -72,7 +72,7 @@ def load_systems_to_search():
     except FileNotFoundError:
         print(f"Arquivo {filename} não encontrado. Usando lista padrão.")
         input("Pressione ENTER para continuar...")
-        return ["TRAMITE 5.00", "ALMOX 5.00", "SCF 5.00", "STP 5.00", "SBI 5.00"]
+        return ["TRAMITE", "ALMOX", "SCF", "STP", "SBI"]
     
 def show_log_option():
 
@@ -250,9 +250,9 @@ def search_tickets(browser, systems_to_search, print_log):
 
         for row in rows:
             try:
-                td_text = row.find_element('xpath', './td[3]').text
+                td_text = row.find_element('xpath', './td[3]').text.lower() 
                 for system in systems_to_search:
-                    if system in td_text:
+                    if system.lower() in td_text:
                         ticket_number = row.find_element('xpath', './td[2]/a').text
                         found_contents.append((ticket_number, system))
             except Exception as e:
