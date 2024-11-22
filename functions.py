@@ -11,6 +11,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
 from plyer import notification
 from datetime import datetime
+import base64
 import getpass
 import json
 import os
@@ -174,6 +175,16 @@ def get_credentials():
 
     username = input("Login: ")
     password = getpass.getpass("Senha (Nao será mostrada no terminal): ")
+    save_login = input("Deseja salvar o login? (S/N): ")
+    encoded_password = base64.b64encode(password.encode("utf-8")).decode("utf-8")
+    if save_login.upper() == "S":
+        with open("arquivos/credentials.json", "w") as file:
+            json.dump({"username": username, "password": encoded_password}, file)
+            print("Credenciais salvas com sucesso.")
+    else:
+        print("Credenciais não salvas.")
+
+
     return username, password
 
 def access_colaborador(browser, username, password, print_log):
