@@ -1,10 +1,7 @@
 from utils import clear_console, print_art
-from functions import get_credentials, start_browser, access_colaborador, search_tickets, display_results, config_menu, print_log_message
-from datetime import datetime
+from functions import start_browser, access_colaborador, search_tickets, display_results, config_menu, print_log_message, verify_first_credentials
 import time 
-import os
-import json
-import base64
+
 
 
 def main():
@@ -12,16 +9,7 @@ def main():
     clear_console()
     print_art()
 
-    if os.path.exists('arquivos/credentials.json'):
-        with open('arquivos/credentials.json', 'r') as file:
-            credentials = json.load(file)
-            username = credentials.get('username')
-            encoded_password = credentials.get('password')
-            password = base64.b64decode(encoded_password.encode("utf-8")).decode("utf-8")
-            if username and password:
-                print("Credenciais carregadas com sucesso.")
-    else:
-        username, password = get_credentials()
+    username, password = verify_first_credentials()
 
     search_interval_min, search_interval_sec, systems_to_search, print_log = config_menu()
     

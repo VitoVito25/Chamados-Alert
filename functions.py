@@ -170,6 +170,19 @@ def start_browser(print_log):
     
     return browser
 
+def verify_first_credentials():
+    if os.path.exists("arquivos/credentials.json"):
+        with open("arquivos/credentials.json", "r") as file:
+            credentials = json.load(file)
+            username = credentials.get("username")
+            encoded_password = credentials.get("password")
+            password = base64.b64decode(encoded_password.encode("utf-8")).decode("utf-8")
+            if username and password:
+                print("Credenciais carregadas com sucesso.")
+                return username, password
+    else:
+        return get_credentials()
+
 def get_credentials():
     print("Insira os dados de acesso ao Colaborador")
 
