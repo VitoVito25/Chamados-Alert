@@ -27,13 +27,13 @@ def add_systems_to_search_and_save():
         if system_name == "":
             # Se o usuário não digitar nada, definir sistemas padrão e sair do loop
             if not systems_list:
-                systems_list = ["TRAMITE 5.00", "ALMOX 5.00", "SCF 5.00", "STP 5.00", "SBI 5.00"]
+                systems_list = ["TRAMITE", "ALMOX", "SCF", "STP", "SBI"]
                 print("Nenhum sistema informado. Usando a configuração padrão.")
                 input("Pressione ENTER para continuar...")
             break
 
-        # Formatar o nome do sistema (maiúsculo + " 5.00")
-        formatted_system = system_name.upper() + " 5.00"
+        # Formatar o nome do sistema (maiúsculo)
+        formatted_system = system_name.upper()
         systems_list.append(formatted_system)
 
     # Chamar a função para salvar os sistemas no arquivo JSON
