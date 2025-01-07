@@ -117,8 +117,6 @@ def config_menu():
                 #Padrão de intervalo entre buscas 5 minutos
                 search_interval_min = 5
                 search_interval_sec = 300
-                # Lista de sistemas carregada de um arquivo JSON
-                systems_to_search = load_systems_to_search()
                 # Configuração para nao mostrar o LOG
                 print_log = False
                 break  # Sai do loop se a configuração padrão for escolhida
@@ -128,7 +126,6 @@ def config_menu():
                 clear_console()
                 print_art()
                 search_interval_min, search_interval_sec = get_search_interval()
-                systems_to_search = add_systems_to_search_and_save()
                 print_log = show_log_option()
                 break  # Sai do loop após configurar
             else:
@@ -137,7 +134,7 @@ def config_menu():
         except ValueError:
             print("Erro: Valor inválido, por favor tente novamente.")
 
-    return search_interval_min, search_interval_sec, systems_to_search, print_log
+    return search_interval_min, search_interval_sec, print_log
  
 # Variável global para armazenar a instância do navegador
 browser = None    
@@ -204,21 +201,21 @@ def access_colaborador(browser, username, password, print_log):
     while True:
         try:
             # Verifica se já estamos logados tentando acessar um elemento que só existe após o login
-            browser.get("https://central.equiplano.com.br/colaborador/buscarChamado")
-            browser.find_element('xpath', '//*[@id="tableMeusChamados_wrapper"]')
+            browser.get("https://central.equiplano.com.br/colaborador/preAtendimento/listarNotificacoes")
+            browser.find_element('xpath', '//*[@id="tabelaNotificacoes"]')
             print_log_message(print_log, "[LOG] Já estamos logados no sistema.")
             break
         except:
             print_log_message(print_log, "[LOG] Não está logado, realizando o login...")
 
-            browser.get("https://central.equiplano.com.br/colaborador/buscarChamado")
+            browser.get("https://central.equiplano.com.br/colaborador/preAtendimento/listarNotificacoes")
             browser.find_element('xpath','//*[@id="login"]').send_keys(username)
             browser.find_element('xpath','//*[@id="senha"]').send_keys(password)
             browser.find_element('xpath','/html/body/div/div/div/form/div/div[2]/div[3]/button').click()
             # Verifica se o Login foi feito com sucesso
             try:
                 # Verifica se o elemento da página de chamados está presente
-                browser.find_element('xpath', '//*[@id="tableMeusChamados_wrapper"]')
+                browser.find_element('xpath', '//*[@id="tabelaNotificacoes"]')
                 print_log_message(print_log, "[LOG] Login realizado com sucesso!")
                 break
             except NoSuchElementException:
@@ -254,54 +251,36 @@ def get_search_interval():
     search_interval_sec = search_interval_min * 60
     return search_interval_min, search_interval_sec
 
-def search_tickets(browser, systems_to_search, print_log):
+def search_tickets(browser, print_log):
     
     print_log_message(print_log, "[LOG] Realizando busca...")
 
     try:
-        # Filtrando chamados do Suporte
-        Select(browser.find_element('xpath', '//*[@id="page-wrapper"]/div[2]/div[1]/form/div/div[2]/div[2]/select')).select_by_value('3053')
-        browser.find_element('xpath', '//*[@id="page-wrapper"]/div[2]/div[1]/form/div/div[1]/button').click()
+        # Localizando a celular com o conteudo de sem chamados
+        cell = browser.find_elements('xpath', '//*[@id="tabelaNotificacoes"]/tbody/tr[1]/td[1]')
 
-        # Aguardando a tabela carregar após o clique (espera explícita)
-        WebDriverWait(browser, 10).until(EC.presence_of_element_located((By.XPATH, '//*[@id="tableMeusChamados"]/tbody/tr')))
+        text = cell.text.lower()
 
-        # Iniciando lista para valores encontrados
-        found_contents = []
-
-        # Contabilizando número de linhas na tabela
-        rows = browser.find_elements('xpath', '//*[@id="tableMeusChamados"]/tbody/tr')
-
-        for row in rows:
-            try:
-                td_text = row.find_element('xpath', './td[3]').text.lower() 
-                for system in systems_to_search:
-                    if system.lower() in td_text:
-                        ticket_number = row.find_element('xpath', './td[2]/a').text
-                        found_contents.append((ticket_number, system))
-            except Exception as e:
-                print(f"Erro ao processar linha: {e}")
-
-        return found_contents
+        if(text == "Sem registros"):
+            return False
+        else:
+            return True
 
     except Exception as e:
         print(f"Erro durante a busca: {e}")
         return []
 
-def display_results(found_contents):
+def display_results(tickets_exist):
     hora_atual = datetime.now().strftime("%H:%M:%S")
-    if found_contents:       
-        print(f"[{hora_atual}] Novos chamados encontrados: ")
-        notification_message = ""
-        for number, system in found_contents:
-            print(f"Número do chamado: {number} - Sistema: {system}")
-            notification_message += f"Número do chamado: {number} - Sistema: {system}\n"
+    if tickets_exist:       
+        print(f"[{hora_atual}] Novos chamados encontrados ")
+        notification_message = "Existem novos andamentos aguardando sua posição!"
 
         notification.notify(
             title="Novos Chamados Encontrados!",
             message=notification_message.strip(),
             app_name="Sistema de Alerta de Chamados",
-            timeout=30
+            timeout=5
         )
     else:
         print(f"[{hora_atual}] Nenhum chamado encontrado no momento.")
