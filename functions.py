@@ -155,9 +155,13 @@ def start_browser(print_log):
     if browser is None:
 
         print_log_message(print_log, "[LOG] O navegador não estava aberto. Iniciando uma nova instância.")
+
+        chrome_options = Options()
+        chrome_options.add_argument("--headless")
+        chrome_options.add_argument("--disable-gpu")
         
         service = Service(ChromeDriverManager().install())
-        browser = webdriver.Chrome(service=service)
+        browser = webdriver.Chrome(service=service, options=chrome_options)
     else:
         try:
             # Tenta acessar a URL atual para verificar se o navegador está ativo
